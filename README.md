@@ -78,6 +78,7 @@ The HMAC values are stored in site config:
 
 - `openclaw_bridge_hmac_key_id`
 - `openclaw_bridge_hmac_secret`
+- `openclaw_bridge_audit_log_path` (optional override)
 
 If these values do not exist during install, the app generates them automatically.
 
@@ -143,6 +144,8 @@ Recommended production setup:
 - keep `MAX_ROWS` conservative
 - expose the endpoints only over HTTPS
 - monitor audit logs
+
+By default, audit logs are written to the current bench's `logs/openclaw_bridge_audit.log`. You can override that path with `openclaw_bridge_audit_log_path` in `site_config.json`.
 
 ### Development Notes
 

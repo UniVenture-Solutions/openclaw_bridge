@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -26,7 +27,7 @@ class Settings:
     max_concurrent_queries: int = 5
     rate_limit_rpm: int = 60
 
-    audit_log_path: str = "/home/frappe/dev-bench/logs/openclaw_bridge_audit.log"
+    audit_log_path: str = ""
     log_level: str = "INFO"
 
 
@@ -55,10 +56,21 @@ def _site_fallback() -> dict:
             "readonly_password": conf.get("openclaw_bridge_readonly_password"),
             "hmac_key_id": conf.get("openclaw_bridge_hmac_key_id"),
             "hmac_secret": conf.get("openclaw_bridge_hmac_secret"),
+            "audit_log_path": conf.get("openclaw_bridge_audit_log_path"),
         }
         return {k: v for k, v in common.items() if v}
     except Exception:
         return {}
+
+
+def _default_audit_log_path() -> str:
+    try:
+        import frappe  # type: ignore
+
+        return str(Path(frappe.utils.get_bench_path()) / "logs" / "openclaw_bridge_audit.log")
+    except Exception:
+        bench_path = Path(__file__).resolve().parents[4]
+        return str(bench_path / "logs" / "openclaw_bridge_audit.log")
 
 
 def load_settings() -> Settings:
@@ -78,9 +90,7 @@ def load_settings() -> Settings:
         query_timeout_ms=_int_env("QUERY_TIMEOUT_MS", 10000),
         max_concurrent_queries=_int_env("MAX_CONCURRENT_QUERIES", 5),
         rate_limit_rpm=_int_env("RATE_LIMIT_RPM", 60),
-        audit_log_path=os.getenv(
-            "AUDIT_LOG_PATH", "/home/frappe/dev-bench/logs/openclaw_bridge_audit.log"
-        ),
+        audit_log_path=os.getenv("AUDIT_LOG_PATH", ""),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
     )
 
@@ -89,6 +99,8 @@ def load_settings() -> Settings:
         cfg.hmac_key_id = fallback.get("hmac_key_id", "")
     if not cfg.hmac_secret:
         cfg.hmac_secret = fallback.get("hmac_secret", "")
+    if not cfg.audit_log_path:
+        cfg.audit_log_path = fallback.get("audit_log_path", "")
     if not cfg.db_name:
         cfg.db_name = fallback.get("db_name", "")
     if not cfg.db_user:
@@ -101,6 +113,8 @@ def load_settings() -> Settings:
         cfg.db_password = fallback.get("db_password", "")
     if cfg.db_host == "127.0.0.1" and fallback.get("db_host"):
         cfg.db_host = fallback["db_host"]
+    if not cfg.audit_log_path:
+        cfg.audit_log_path = _default_audit_log_path()
 
     return cfg
 
