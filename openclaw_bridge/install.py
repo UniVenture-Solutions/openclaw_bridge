@@ -84,14 +84,8 @@ def provision_readonly_db_user() -> dict[str, str]:
             db_port=int(conf.get("db_port") or frappe.conf.db_port or 3306),
         )
 
-    update_site_config(
-        {
-            "openclaw_bridge_readonly_user": user,
-            "openclaw_bridge_readonly_host": host,
-            "openclaw_bridge_readonly_password": password,
-        },
-        validate=False,
-    )
+        update_site_config("openclaw_bridge_hmac_key_id", key_id, validate=False)
+    	update_site_config("openclaw_bridge_hmac_secret", secret, validate=False)
 
     return {
         "db_name": db_name,
