@@ -167,6 +167,20 @@ Example route layout for a site hosted at `https://example.com`:
 - SSE: `https://example.com/api/method/openclaw_bridge.api.mcp_sse`
 - Health: `https://example.com/api/method/openclaw_bridge.api.health_check`
 
+OpenClaw's normal remote MCP configuration sends fixed headers, while this bridge requires a fresh HMAC signature per request. Use the included [stdio signing proxy](scripts/openclaw_stdio_proxy.py) on the OpenClaw host. Save the HMAC secret in an owner-readable file outside the repository, then register the proxy:
+
+```bash
+openclaw mcp add traders-bridge \
+  --command python3 \
+  --arg /opt/openclaw_bridge/scripts/openclaw_stdio_proxy.py \
+  --env OPENCLAW_BRIDGE_URL=https://example.com/api/method/openclaw_bridge.api.mcp \
+  --env OPENCLAW_BRIDGE_KEY_ID=your-key-id \
+  --env OPENCLAW_BRIDGE_SECRET_FILE=/path/to/bridge-secret
+openclaw mcp doctor traders-bridge --probe
+```
+
+The proxy uses only Python's standard library and communicates with OpenClaw over MCP stdio. It sends each JSON-RPC request to the HTTPS bridge with a new timestamp, nonce, and HMAC signature.
+
 ### Repository Structure
 
 - [openclaw_bridge/api.py](openclaw_bridge/api.py): Frappe-exposed MCP endpoints
