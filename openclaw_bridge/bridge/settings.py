@@ -49,9 +49,8 @@ def _site_fallback() -> dict:
         conf = frappe.get_site_config() or {}
         common = {
             "db_host": conf.get("db_host"),
+            "db_port": conf.get("db_port"),
             "db_name": conf.get("db_name"),
-            "db_user": conf.get("db_user"),
-            "db_password": conf.get("db_password"),
             "readonly_user": conf.get("openclaw_bridge_readonly_user"),
             "readonly_password": conf.get("openclaw_bridge_readonly_password"),
             "hmac_key_id": conf.get("openclaw_bridge_hmac_key_id"),
@@ -107,12 +106,10 @@ def load_settings() -> Settings:
         cfg.db_user = fallback.get("readonly_user", "")
     if not cfg.db_password:
         cfg.db_password = fallback.get("readonly_password", "")
-    if not cfg.db_user:
-        cfg.db_user = fallback.get("db_user", "")
-    if not cfg.db_password:
-        cfg.db_password = fallback.get("db_password", "")
     if cfg.db_host == "127.0.0.1" and fallback.get("db_host"):
         cfg.db_host = fallback["db_host"]
+    if cfg.db_port == 3306 and fallback.get("db_port"):
+        cfg.db_port = int(fallback["db_port"])
     if not cfg.audit_log_path:
         cfg.audit_log_path = _default_audit_log_path()
 
