@@ -97,13 +97,8 @@ def ensure_bridge_secrets() -> dict[str, str | int]:
     key_id = str(conf.get("openclaw_bridge_hmac_key_id") or "openclaw-ut-prod")
     secret = str(conf.get("openclaw_bridge_hmac_secret") or secrets.token_urlsafe(48))
 
-    update_site_config(
-        {
-            "openclaw_bridge_hmac_key_id": key_id,
-            "openclaw_bridge_hmac_secret": secret,
-        },
-        validate=False,
-    )
+    update_site_config("openclaw_bridge_hmac_key_id", key_id, validate=False)
+    update_site_config("openclaw_bridge_hmac_secret", secret, validate=False)
 
     return {
         "hmac_key_id": key_id,
