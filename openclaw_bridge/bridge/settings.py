@@ -51,6 +51,9 @@ def _site_fallback() -> dict:
             "db_host": conf.get("db_host"),
             "db_port": conf.get("db_port"),
             "db_name": conf.get("db_name"),
+            "site_db_user": conf.get("db_user"),
+            "site_db_password": conf.get("db_password"),
+            "use_site_db_credentials": conf.get("openclaw_bridge_use_site_db_credentials"),
             "readonly_user": conf.get("openclaw_bridge_readonly_user"),
             "readonly_password": conf.get("openclaw_bridge_readonly_password"),
             "hmac_key_id": conf.get("openclaw_bridge_hmac_key_id"),
@@ -106,6 +109,13 @@ def load_settings() -> Settings:
         cfg.db_user = fallback.get("readonly_user", "")
     if not cfg.db_password:
         cfg.db_password = fallback.get("readonly_password", "")
+    if (
+        str(fallback.get("use_site_db_credentials", "")).lower() in {"1", "true", "yes"}
+        and not cfg.db_user
+        and not cfg.db_password
+    ):
+        cfg.db_user = fallback.get("site_db_user", "")
+        cfg.db_password = fallback.get("site_db_password", "")
     if cfg.db_host == "127.0.0.1" and fallback.get("db_host"):
         cfg.db_host = fallback["db_host"]
     if cfg.db_port == 3306 and fallback.get("db_port"):

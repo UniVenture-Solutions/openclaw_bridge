@@ -97,6 +97,8 @@ If the current DB account does not have `CREATE USER` / `GRANT` privileges, inst
 - [scripts/create_readonly_user.sql](scripts/create_readonly_user.sql)
 - [scripts/rotate_site_db_creds.md](scripts/rotate_site_db_creds.md)
 
+For a site where the administrator explicitly chooses to use its existing Frappe database account, set `openclaw_bridge_use_site_db_credentials` to `1` in that site's `site_config.json`. The bridge then uses the site's `db_user` and `db_password` when no dedicated bridge credentials are configured. This account may have write privileges; the bridge's SQL validation and read-only transaction are the remaining protections. Keep HMAC credentials private and use HTTPS.
+
 You can also provide elevated DB credentials in site config if you want install-time auto-provisioning to succeed on restricted benches:
 
 - `openclaw_bridge_admin_db_user`
